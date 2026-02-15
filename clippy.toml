@@ -1,0 +1,14 @@
+# Prevent overly large functions
+too-many-arguments-threshold = 6
+
+# Encourage smaller modules
+cognitive-complexity-threshold = 25
+
+# Avoid excessive type complexity in signatures
+type-complexity-threshold = 250
+
+# Avoid large stack allocations
+stack-size-threshold = 512000
+
+# Warn when functions get too long
+too-many-lines-threshold = 200

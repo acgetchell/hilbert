@@ -1,6 +1,11 @@
+#![deny(clippy::unwrap_used)]
+#![deny(clippy::expect_used)]
+#![deny(clippy::todo)]
+#![deny(clippy::dbg_macro)]
+
 use anyhow::Result;
 use quick_xml::de::from_str;
-use reqwest::Client;
+use reqwest::Response;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
@@ -34,7 +39,7 @@ async fn fetch_arxiv(query: &str) -> Result<Vec<Paper>> {
         .user_agent("hilbert.tools (research app; contact: your@email.com)")
         .build()?;
 
-    let resp: reqwest::Response = client
+    let resp: Response = client
         .get("https://export.arxiv.org/api/query")
         .query(&[
             ("search_query", format!("all:{}", query)),

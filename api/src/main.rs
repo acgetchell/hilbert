@@ -1,3 +1,8 @@
+#![deny(clippy::unwrap_used)]
+#![deny(clippy::expect_used)]
+#![deny(clippy::todo)]
+#![deny(clippy::dbg_macro)]
+
 use axum::{Json, Router, routing::post};
 use core::search_papers;
 use serde::Deserialize;
@@ -8,14 +13,14 @@ struct SearchRequest {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
 
     let app = Router::new().route("/search", post(search));
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-
-    axum::serve(listener, app).await.unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;
+    axum::serve(listener, app).await?;
+    Ok(())
 }
 
 async fn search(Json(payload): Json<SearchRequest>) -> Json<serde_json::Value> {
