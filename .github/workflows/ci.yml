@@ -22,7 +22,7 @@ jobs:
         with:
           tool: just
 
-      - name: Install typos-cli
+      - name: Install dprint
         uses: taiki-e/install-action@509565405a8a987e73cf742e26b26dcc72c4b01a # v2.67.26
         with:
           tool: dprint

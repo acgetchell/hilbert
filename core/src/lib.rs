@@ -4,7 +4,6 @@
 #![deny(clippy::dbg_macro)]
 
 use anyhow::Result;
-use quick_xml::de::from_str;
 use reqwest::Response;
 use serde::{Deserialize, Serialize};
 
@@ -52,7 +51,20 @@ async fn fetch_arxiv(query: &str) -> Result<Vec<Paper>> {
 
     let response: String = resp.text().await?;
 
-    let feed: Feed = from_str(&response)?;
+    parse_feed(&response)
+}
+
+pub async fn search_papers(query: &str) -> Result<Vec<Paper>> {
+    let papers = fetch_arxiv(query).await?;
+
+    // For now, skip embeddings
+    // Just return results to verify arXiv works
+
+    Ok(papers)
+}
+
+fn parse_feed(xml: &str) -> anyhow::Result<Vec<Paper>> {
+    let feed: Feed = quick_xml::de::from_str(xml)?;
 
     let mut papers = Vec::new();
 
@@ -71,11 +83,43 @@ async fn fetch_arxiv(query: &str) -> Result<Vec<Paper>> {
     Ok(papers)
 }
 
-pub async fn search_papers(query: &str) -> Result<Vec<Paper>> {
-    let papers = fetch_arxiv(query).await?;
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used)]
+    use super::*;
 
-    // For now, skip embeddings
-    // Just return results to verify arXiv works
+    #[test]
+    fn parse_feed_parses_single_entry() {
+        let xml = r#"
+        <feed xmlns="http://www.w3.org/2005/Atom">
+            <entry>
+                <title>Test Paper</title>
+                <summary>Test Abstract</summary>
+                <id>http://arxiv.org/abs/1234.5678</id>
+                <author>
+                    <name>John Doe</name>
+                </author>
+            </entry>
+        </feed>
+        "#;
 
-    Ok(papers)
+        let papers = parse_feed(xml).unwrap();
+
+        assert_eq!(papers.len(), 1);
+        assert_eq!(papers[0].title, "Test Paper");
+        assert_eq!(papers[0].abstract_text, "Test Abstract");
+        assert_eq!(papers[0].authors[0], "John Doe");
+        assert_eq!(papers[0].url, "http://arxiv.org/abs/1234.5678");
+    }
+
+    #[test]
+    fn parse_feed_handles_empty_feed() {
+        let xml = r#"
+    <feed xmlns="http://www.w3.org/2005/Atom">
+    </feed>
+    "#;
+
+        let papers = parse_feed(xml).unwrap();
+        assert!(papers.is_empty());
+    }
 }

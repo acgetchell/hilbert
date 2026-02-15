@@ -3,11 +3,10 @@ build:
     cargo build --all
 
 # Run all checks
-check: fmt lint md test typos
+check: fmt lint md-check test typos
 
 # Default recipe
-default:
-    dev
+default: dev
 
 # Run the API server
 dev:
@@ -22,8 +21,7 @@ fmt-fix:
     cargo fmt --all
 
 # Fix issues
-fix:
-    fmt-fix typos-fix
+fix: fmt-fix typos-fix
 
 # Run clippy strictly
 lint:
