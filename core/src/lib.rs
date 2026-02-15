@@ -1,7 +1,7 @@
 use anyhow::Result;
 use quick_xml::de::from_str;
-use serde::{Deserialize, Serialize};
 use reqwest::Client;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
 struct Feed {
@@ -31,21 +31,21 @@ pub struct Paper {
 
 async fn fetch_arxiv(query: &str) -> Result<Vec<Paper>> {
     let client = reqwest::Client::builder()
-    .user_agent("hilbert.tools (research app; contact: your@email.com)")
-    .build()?;
+        .user_agent("hilbert.tools (research app; contact: your@email.com)")
+        .build()?;
 
-let resp: reqwest::Response = client
-    .get("https://export.arxiv.org/api/query")
-    .query(&[
-        ("search_query", format!("all:{}", query)),
-        ("start", "0".to_string()),
-        ("max_results", "10".to_string()),
-    ])
-    .send()
-    .await?
-    .error_for_status()?; // fail on non-200
+    let resp: reqwest::Response = client
+        .get("https://export.arxiv.org/api/query")
+        .query(&[
+            ("search_query", format!("all:{}", query)),
+            ("start", "0".to_string()),
+            ("max_results", "10".to_string()),
+        ])
+        .send()
+        .await?
+        .error_for_status()?; // fail on non-200
 
-let response: String = resp.text().await?;
+    let response: String = resp.text().await?;
 
     let feed: Feed = from_str(&response)?;
 
