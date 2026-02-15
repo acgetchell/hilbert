@@ -1,0 +1,17 @@
+[default]
+extend-ignore-re = [
+  # Ignore common Rust lifetime names
+  "'[a-zA-Z_]+",
+]
+
+[files]
+extend-exclude = [
+  "target/",
+]
+
+[default.extend-words]
+# Add domain-specific words here as they appear
+hilbert = "hilbert"
+axum = "axum"
+arxiv = "arxiv"
+qdrant = "qdrant"
